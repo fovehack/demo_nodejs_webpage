@@ -1,4 +1,5 @@
 version: 2.1
+
 jobs:
   build_test:
     docker:
@@ -7,8 +8,8 @@ jobs:
       - checkout
       - run:
           name: Install npm dependencies
-          command: |
-            npm install --save	
+          command: npm install --save
+
   build_docker_image:
     docker:
       - image: circleci/node:12
@@ -18,14 +19,16 @@ jobs:
           docker_layer_caching: false
       - run:
           name: Build Docker image
-          command: |
-            docker build -t nodejswebapp1 -t fovehack/nodejswebapp1:latest .
-            echo $DOCKER_PASSWORD | docker login -u fove --password-stdin
-            docker push fovehack/nodejswebapp1:latest
+          command: docker build -t nodejswebapp1 -t fove/nodejswebapp1 .
+      - run:
+          name: Docker Login
+          command: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+      - run:
+          name: Push to Docker Hub
+          command: docker push fove/nodejswebapp1
 
 workflows:
-  build_test:
+  build_and_push:
     jobs:
       - build_test
       - build_docker_image
-      
